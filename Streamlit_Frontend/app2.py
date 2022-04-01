@@ -45,12 +45,24 @@ def predict():
 
         if(r == "Fresh"):
             img = predict_weather(location,begintime,endtime)
-            st.success('The output is {}'.format(result))
-            st.image(img.content)
+            if(str(img.content)[3:23]=="Enter all the fields"):
+                st.warning('Enter all the details')
+            elif(str(img.content)[3]=="L"):
+                 st.warning('Location not found. Please try different location')
+            else:
+                st.success('The output is {}'.format(result))
+                st.image(img.content)
         if(r == "Cache"):
             loc = locator(location)
             if(loc=="hitapi"):
                 img = predict_weather(location,begintime,endtime)
+                if(str(img.content)[3:23]=="Enter all the fields"):
+                    st.warning('Enter all the details')
+                elif(str(img.content)[3]=="L"):
+                    st.warning('Location not found. Please try different location')
+                else:
+                    st.success('The output is {}'.format(result))
+                    st.image(img.content)
             else:
                 #get loc image from gcs
                 filename = 'gcs://cache_loc_images/' +str(loc)+".png"
