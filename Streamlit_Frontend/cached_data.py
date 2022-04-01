@@ -5,7 +5,7 @@ from nearbyloc import locfinder
 
 
 def locator (begin_location):
-    cache_df = pd.read_csv("Cacheloc_Details.csv")
+    cache_df = pd.read_csv("Streamlit_Frontend/Cacheloc_Details.csv")
     if cache_df.loc[cache_df['location']==begin_location].shape[0] >= 1:
         return begin_location
     else:
