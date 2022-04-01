@@ -2,15 +2,15 @@
 #export const COMPONENT_READY_WARNING_TIME_MS = 3000
 import streamlit as st
 #import tensorflow as tf
-from PIL import Image
+#from PIL import Image
 import requests
 from cached_data import locator
 import gcsfs
-from google.cloud import storage
+#from google.cloud import storage
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-
-source= "premium-strata-340618-745287f8fd66.json"
+#Streamlit_Frontend/premium-strata-340618-745287f8fd66.json
+source= "Streamlit_Frontend/premium-strata-340618-745287f8fd66.json"
 projectid = 'premium-strata-340618'
 gcs = gcsfs.GCSFileSystem(project=projectid, token=source)
 print("hello")
