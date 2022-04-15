@@ -11,7 +11,7 @@ def locfinder(loc):
         lat = location.latitude
         lon = location.longitude
 
-        path = "Streamlit_Frontend/StormEvents_details.csv"
+        path = "StormEvents_details.csv"
         df_main = pd.read_csv(path, index_col=False)
 
         loc_info = df_main[["BEGIN_LOCATION", "BEGIN_LAT", "BEGIN_LON"]].dropna().drop_duplicates()

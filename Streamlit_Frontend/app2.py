@@ -2,18 +2,20 @@
 #export const COMPONENT_READY_WARNING_TIME_MS = 3000
 import streamlit as st
 #import tensorflow as tf
-#from PIL import Image
+from PIL import Image
 import requests
 from cached_data import locator
+from locepnarr import findepnarr
+from englishtospanish import en_to_esp
 import gcsfs
-#from google.cloud import storage
+from google.cloud import storage
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-#Streamlit_Frontend/premium-strata-340618-745287f8fd66.json
-source= "Streamlit_Frontend/premium-strata-340618-745287f8fd66.json"
+import json
+source= "premium-strata-340618-745287f8fd66.json"
 projectid = 'premium-strata-340618'
 gcs = gcsfs.GCSFileSystem(project=projectid, token=source)
-print("hello")
+
 
 def predict_weather(location,begintime,endtime):
 
@@ -39,16 +41,52 @@ def predict():
 
     result=""
     r = st.radio("Pick one", ('Fresh', 'Cache'),index =1)
-
+    lang = st.selectbox('Select a Language:',('English','Spanish'))
+    
     #if st.selectbox('Fresh'):
     if st.button("Predict"):
-
+        
+        epi,event = findepnarr(location,begintime,endtime)
+        narrsummary= requests.post('https://mim72xi7ra.execute-api.us-east-1.amazonaws.com/dev/qa',json=epi)
+        answer = json.loads(narrsummary.content.decode())
+        ner = requests.post('https://08xistdo89.execute-api.us-east-1.amazonaws.com/dev/qa',json=epi)
+        answer2 = json.loads(ner.content.decode())
+        eventsummary= requests.post('https://mim72xi7ra.execute-api.us-east-1.amazonaws.com/dev/qa',json=event)
+        evanswer = json.loads(eventsummary.content.decode())
+        ner = requests.post('https://08xistdo89.execute-api.us-east-1.amazonaws.com/dev/qa',json=event)
+        answer2 = json.loads(ner.content.decode())
+        episodesumm = str(answer['answer'][0]['summary_text'])
+        epner = str(answer2['answer'][0:])
+        eventsumm = str(evanswer['answer'][0]['summary_text'])
+        eventner = str(answer2['answer'][0:])
+        if(lang == "English"):
+            st.info("Episode Summary:"+" "+ episodesumm)
+            
+            st.info("Episode Named Entities:"+" "+epner)
+            
+            st.info("Event Summary:"+" "+ eventsumm)
+            
+            st.info("Event Named Entities:"+" "+eventner)#
+        else:
+            
+            episodesumm_es,epner_es,eventsumm_es,eventner_es = en_to_esp(episodesumm,epner,eventsumm,eventner)
+            st.info("Resumen del Episodio:"+" "+ episodesumm_es)
+            
+            st.info("Episodio llamado Entidades:"+" "+epner_es)
+            
+            st.info("Resumen del evento:"+" "+ eventsumm_es)
+            
+            st.info("Entidades con nombre de evento:"+" "+eventner_es)
+        
         if(r == "Fresh"):
             img = predict_weather(location,begintime,endtime)
+            #print(img.content)
             if(str(img.content)[3:23]=="Enter all the fields"):
                 st.warning('Enter all the details')
             elif(str(img.content)[3]=="L"):
                  st.warning('Location not found. Please try different location')
+            elif(str(img.content)[3:25]=="Request Limit Exceeded"):
+                 st.warning('Request Limit Exceeded')
             else:
                 st.success('The output is {}'.format(result))
                 st.image(img.content)
@@ -89,6 +127,7 @@ def main():
         if st.sidebar.checkbox("Login"):
             login_data = {"email": email,"password": password}
             response = requests.post('https://nowcastserviceapi-dot-premium-strata-340618.uk.r.appspot.com/user/login',json=login_data)
+            
             if(response.content.decode()[2:7] == "error"):
                 st.warning("Incorrect Username/Password")
             elif(response.content.decode()[2:8] == "detail"):
