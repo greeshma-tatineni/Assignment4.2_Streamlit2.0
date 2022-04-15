@@ -12,7 +12,7 @@ from google.cloud import storage
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import json
-source= "premium-strata-340618-745287f8fd66.json"
+source= "Streamlit_Frontend/premium-strata-340618-745287f8fd66.json"
 projectid = 'premium-strata-340618'
 gcs = gcsfs.GCSFileSystem(project=projectid, token=source)
 
